@@ -81,3 +81,13 @@
     text-decoration: none;
     color: black;
 }
+
+.about > h2 {
+    font-family: Arial, Helvetica, sans-serif;
+}
+.user-card{
+    font-family: "Lucida Console", "Courier New", monospace;
+    border: 1px solid black;
+    padding: 10px;
+    margin: 5px;
+}
