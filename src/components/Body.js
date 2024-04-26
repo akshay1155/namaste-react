@@ -4,11 +4,13 @@ import { useState, useEffect } from "react";
 import Shimmer from "./Shimmer";
 import { Link } from "react-router-dom";
 import { RES_LIST_URL } from "../utils/constants";
+import useOnlineStatus from "../utils/useOnlineStatus";
+
 const Body = () => {
   //State Variable - Super Powerful variable
   const [listOfRestaurants, setListOfRestaurants] = useState([]);
   const [filteredRestaurant, setFilteredRestaurant] = useState([]);
-
+  const onlineStatus = useOnlineStatus();
   const [searchText, setSearchText] = useState("");
   //console.log("body rendered");
   useEffect(() => {
@@ -30,7 +32,11 @@ const Body = () => {
   if (listOfRestaurants.length === 0) {
     return <Shimmer />;
   }
-
+  
+  if(onlineStatus === false)
+    return (
+      <h1>Looks like you're offline !! Please check your internet connection.</h1>
+    );
   return (
     <div className="body">
       <div className="filter">
