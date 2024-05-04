@@ -1,10 +1,11 @@
 import RestaurantCard from "./RestaurantCard";
 import { resList } from "../utils/mockData";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import Shimmer from "./Shimmer";
 import { Link } from "react-router-dom";
 import { RES_LIST_URL } from "../utils/constants";
 import useOnlineStatus from "../utils/useOnlineStatus";
+import UserContext from "../utils/UserContext";
 
 const Body = () => {
   //State Variable - Super Powerful variable
@@ -12,7 +13,8 @@ const Body = () => {
   const [filteredRestaurant, setFilteredRestaurant] = useState([]);
   const onlineStatus = useOnlineStatus();
   const [searchText, setSearchText] = useState("");
-  //console.log("body rendered");
+  
+  //console.log("body rendered", listOfRestaurants);
   useEffect(() => {
     fetchData();
   }, []);
@@ -20,36 +22,44 @@ const Body = () => {
     const data = await fetch(RES_LIST_URL);
 
     const json = await data.json();
-    console.log(json);
+    //console.log(json);
     setFilteredRestaurant(
       json?.data?.cards[4]?.card?.card?.gridElements?.infoWithStyle?.restaurants
     );
     setListOfRestaurants(
       json?.data?.cards[4]?.card?.card?.gridElements?.infoWithStyle?.restaurants
     );
+    
   };
+
+  const { loggedInUser, setUserName } = useContext(UserContext);
+  
   //Conditional Rendering
   if (listOfRestaurants.length === 0) {
     return <Shimmer />;
   }
   
-  if(onlineStatus === false)
+  if (onlineStatus === false)
     return (
-      <h1>Looks like you're offline !! Please check your internet connection.</h1>
+      <h1>
+        Looks like you're offline !! Please check your internet connection.
+      </h1>
     );
+  
   return (
     <div className="body">
-      <div className="filter">
-        <div className="search">
+      <div className="filter flex">
+        <div className="search m-4 p-4">
           <input
             type="text"
-            className="search-box"
+            className="border border-solid border-black "
             value={searchText}
             onChange={(e) => {
               setSearchText(e.target.value);
             }}
           />
           <button
+            className="px-4 py-2 bg-green-100 m-4 rounded-lg"
             onClick={() => {
               //console.log(searchText.toLowerCase());
               const filtered = listOfRestaurants.filter((res) =>
@@ -62,23 +72,37 @@ const Body = () => {
             Search
           </button>
         </div>
-        <button
-          className="filter-btn"
-          onClick={() => {
-            //Filter logic
-            const filteredList = listOfRestaurants.filter(
-              (res) => res.info.avgRating > 4.4
-            );
-            console.log(filteredList);
-            setFilteredRestaurant(filteredList);
-          }}
-        >
-          Top Rated Restaurants
-        </button>
+        <div className="search m-4 p-4 flex items-center">
+          <button
+            className="px-4 py-2 bg-gray-100 rounded-lg"
+            onClick={() => {
+              //Filter logic
+              const filteredList = listOfRestaurants.filter(
+                (res) => res.info.avgRating > 4.4
+              );
+              console.log(filteredList);
+              setFilteredRestaurant(filteredList);
+            }}
+          >
+            Top Rated Restaurants
+          </button>
+        </div>
+        <div className="search m-4 p-4 flex items-center">
+          <label>Username : </label>
+          <input
+            className="border border-black p-2"
+            value={loggedInUser}
+            onChange={(e) => {
+              console.log(e.target.value);
+              setUserName(e.target.value);
+            }}
+          ></input>
+        </div>
       </div>
-      <div className="res-container">
+      <div className="flex flex-wrap">
         {filteredRestaurant.map((restaurant) => (
-          <Link className="link-rescard"
+          <Link
+            className="link-rescard"
             to={"/restaurants/" + restaurant.info.id}
             key={restaurant.info.id}
           >
